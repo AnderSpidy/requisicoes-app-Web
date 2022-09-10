@@ -1,0 +1,63 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-8 col-lg-5 mx-auto">
+      <div class="card my-5 p-1">
+        <div class="card-body text-center">
+          <h1 class="card-title text-primary">Sistema de Requisições</h1>
+          
+          <!-- Inicio do Formulario
+          FormGroup, sinaliza que os objetos para fazer o databinding estao nesse formulario, para utilizar o formControlName
+          ngSubmit sinaliza qual o metodo que ira realizar ao apertar o botao-->
+          <form class="col-md-8 mx-auto" [formGroup]="form" (ngSubmit)="login()">
+            <div class="form-group mt-5">
+              <label for="email" class="form-label fs-5">Email</label>
+              <input type="email" class="form-control" placeholder="Digite seu endereço de email"
+                formControlName="email">
+              <!-- formControlName é a forma que o angula identifica para o typescript para fazer o databinding -->
+            </div>
+
+            <div class="form-group mt-2 my-5">
+              <label for="email" class="form-label fs-5">Senha</label>
+              <input type="password" class="form-control" placeholder="Digite sua senha" formControlName="senha">
+            </div>
+
+            <a role="button" class="text-primary text-decoration-none" (click)="abrirModalRecuperacao(content)">Esqueceu
+              sua senha?</a>
+
+            <div class="d-grid mx-4 gap-2 mt-3">
+              <button type="submit" class="btn btn-primary">
+                <i class="pi pi-sign-in me-1"></i>Login
+              </button>
+            </div>
+          </form>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!--
+ng-tamplate significa que é uma tela que nao vai aparecer a prior na sua pagina
+porem só quando for chamada, sobrepondo a SPA (como se fosse uma jOptionPane do java) -->
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4 class="modal-title" id="modal-basic-title">Profile update</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('fechar')"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="formRecuperacao" (ngSubmit)="modal.close('enviar')">
+      <div class="alert alert-warning" role="alert">
+        Enviaremos um email para o endereço informado com instruções de recuperação.
+      </div>
+      <div class="form-group mb-3">
+        <label for="emailRecuperacao" class="form-label">Endereco de email</label>
+        <input formControlName="emailRecuperacao" type="email" class="form-control"
+          placeholder="Digite o endereço de email">
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-primary col-md-3" (click)="modal.dismiss('fechar')">Cancelar</button>
+    <button type="submit" class="btn btn-primary col-md-3">Enviar</button>
+  </div>
+</ng-template>

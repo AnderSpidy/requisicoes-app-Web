@@ -1,0 +1,27 @@
+<div class="container">
+  <div class="row">
+    <div class="col-12 col-md-10 col-lg-9 mx-auto mt-2 mb-4">
+      <div class="btn-group">
+        <!--rourterLinkActive basicamente ativa uma classe Css quando o botao é acionado,( neste caso é o que deixa o botao preenchido)-->
+        <button
+        routerLinkActive="active"
+        routerLink="/requisicoes/funcionario"
+        class="btn btn-outline-primary"
+        aria-current="page">
+        <i class="pi pi-ticket me-1"></i>Minhas Requisições
+        </button>
+        <button
+        routerLinkActive="active"
+        routerLink="/requisicoes/departamento"
+        class="btn btn-outline-primary">
+        <i class="pi pi-inbox me-1"> Requisições para meu Departamento</i>
+        </button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- aqui fica a divisão para a rota para diferenciar o filtro das requisições -->
+<router-outlet></router-outlet>
+
