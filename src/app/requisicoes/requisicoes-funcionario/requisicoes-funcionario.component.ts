@@ -8,7 +8,6 @@ import { Departamento } from 'src/app/departamentos/models/departamento.model';
 import { DepartamentoService } from 'src/app/departamentos/services/departamento.service';
 import { Equipamento } from 'src/app/equipamentos/models/equipamento.model';
 import { EquipamentoService } from 'src/app/equipamentos/services/equipamento.service';
-import { Funcionario } from 'src/app/funcionarios/models/funcionario.model';
 import { FuncionarioService } from 'src/app/funcionarios/services/funcionario.service';
 import { Requisicao } from '../models/requisicao.model';
 import { RequisicaoService } from '../services/requisicao.service';
@@ -35,12 +34,42 @@ export class RequisicoesFuncionarioComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
+    this.form = this.fb.group({
+      id: new FormControl(""),
+      descricao: new FormControl(""),
+      dataAbertura: new FormControl(""),
+
+      funcionarioId: new FormControl(""),
+      funcionario: new FormControl(""),
+
+      departamentoId: new FormControl(""),
+      departamento: new FormControl(""),
+
+      equipamentoId: new FormControl(""),
+      equipameto: new FormControl(""),
+
+      //vou deixar os atributosa da movimentação aqui, pois aparentemete, o ideal e ter todos os atributos do objeto aqui
+
+      ultimaAtt: new FormControl(""),
+      status: new FormControl(""),
+      movimentacoes: new FormControl("")
+
+    });
+
+    this.departamentos$ = this.departamentoService.selecionarTodos();
+    this.equipamentos$ = this.equipamentoService.selecionarTodos();
+
+
+
     this.processoAutenticado$ = this.authService.usuarioLogado.subscribe(usuario =>{
       const email: string = usuario?.email!; // ao contrario do ponto de interrogação, o ponto de exclamação significa que 'eu como desenvolvedor estou dizendo que de fato, esse atributo NAO VAI SER NULO!' ou seja -confia pô
 
       this.funcionarioService.selecionarFuncionarioLogado(email)
         .subscribe(funcionario => {
-          this.funcionarioLogadoId = funcionario.id
+          this.funcionarioLogadoId = funcionario.id;
+
+          //dessa forma eu estou usando esse metodo do requisição service, em que ele filtra apenas as requisições que são associados ao funcionario que esta logado
+          this.requisicoes$ = this.requisicaoService.selecionarRequisicoesFuncionarioAtual(this.funcionarioLogadoId);
         });
     });
   }
@@ -76,68 +105,51 @@ export class RequisicoesFuncionarioComponent implements OnInit, OnDestroy {
   //método para gravar o novo departamento
   public async gravar(modal: TemplateRef<any>, requisicao?: Requisicao) {
 
-    this.form.reset(); //para limpar todos os dados do formulario, caso possa ter
-
-    if (requisicao) // esse if seria para caso o objeto selecionado já seja um departamento, assim já retorna o próprio departamento da EDIÇÂO
-    {
+    this.form.reset(); //para limpar todos os dados do formulario
+    this.configurarValorespadrão();
+    if(requisicao){
       const departamento = requisicao.departamento ? requisicao.departamento : null;
+      const funcionario = requisicao.funcionario ? requisicao.funcionario : null;
       const equipamento = requisicao.equipamento ? requisicao.equipamento : null;
-      //spread operator (JavaScript)
+
       const requisicaoCompleta = {
-        ...requisicao,
+        ...requisicao,// o spread é como clonar um objeto de requisição direto para a requisiçãoCompleta, com todos os atributos de requisição
         departamento,
+        funcionario,
         equipamento
       }
-      this.form.get("requisicao")?.setValue(requisicaoCompleta);
+      this.form.setValue(requisicaoCompleta);
     }
-
-    try {
+    try{
       await this.modalService.open(modal).result;
+      if(this.form.dirty && this.form.valid){
+        if(!requisicao)
+          await this.requisicaoService.inserir(this.form.value);
+        else
+          await this.requisicaoService.editar(this.form.value);
 
-      // se o formulario estiver preenchido && valido, então pode gravar
-      if (this.form.dirty && this.form.valid) {
-        if (requisicao) {
-          await this.requisicaoService.editar(this.form.get("requisicao")?.value); // caso seja um departamento ja instanciado, vai para o metodo editar
-          this.toastrService.success('ta entrando aqui !', 'Requisicao!', {
-            timeOut: 6000,
-            progressBar: true,
-            positionClass: 'toast-bottom-right'
-          });
-        }
-        else {
-
-
-          // console.log(this.funcionarioLogado);
-          // this.form.get("dataAbertura")?.setValue(new Date(Date.now()).toDateString());
-          // this.form.get("funcionario")?.setValue(this.funcionarioLogado);
-          // this.form.get("funcionarioId")?.setValue(this.funcionarioLogado.id);
-
-          await this.requisicaoService.inserir(this.form.value) // caso contrario, é inserido um departamento novo
-
-          this.toastrService.success('O requisicao foi salvo com Sucesso!', 'Nova requisicao'+ this.form.value.nome + '!', {
-            timeOut: 6000,
-            progressBar: true,
-            positionClass: 'toast-bottom-right'
-          });
-        }
-      }else{
-        this.toastrService.error('O Formulario deve ser preenchido!', 'Falha ao Inserir Novo Funcionario!', {
+        this.toastrService.success(`A requisição foi salva com sucesso!`, "Cadastro de Requisição:", {
           timeOut: 6000,
           progressBar: true,
           positionClass: 'toast-bottom-right'
         });
 
+      }else{
+        this.toastrService.error("Verifique o preenchimento do formulario e tente novamente.","Cadastro de Requisição:", {
+          timeOut: 6000,
+          progressBar: true,
+          positionClass: 'toast-bottom-right'
+        });
       }
-
-
-    } catch (error) {
-      if(error != "fechar" && error != "0" && error != "1")
-      this.toastrService.error('Houve um erro ao inserir um novo Funcionario!', 'Falha ao Inserir Novo Funcionario!', {
-        timeOut: 6000,
-        progressBar: true,
-        positionClass: 'toast-bottom-right'
-      });
+    }catch(erro){
+      if(erro != "fechar" && erro != "0" && erro != "1")
+        this.toastrService.error("Houve um erro ao salvar a sua requisição. Tente Novamente.", "Cadastro de Requisição:", {
+          timeOut: 6000,
+          progressBar: true,
+          positionClass: 'toast-bottom-right'
+        });
     }
+
   }
 
   public async excluir(modalExcluir: TemplateRef<any>, requisicao: Requisicao) {
@@ -163,24 +175,14 @@ export class RequisicoesFuncionarioComponent implements OnInit, OnDestroy {
 
   }
 
+  private configurarValorespadrão(): void{
 
-  // private obterFuncionarioLogado(){
-  //   this.authService.usuarioLogado
-  //     .subscribe(dados =>{
-  //       this.funcionarioService.selecionarFuncionarioLogado(dados?.email!) // a exclamação serve para 'forçar' o andamento do fluxo
-  //         .subscribe(funcionario => {
-  //           this.funcionarioLogado = funcionario;
+    this.form.get("dataAbertura")?.setValue(new Date());
+    this.form.get("equipamentoId")?.setValue(null);
+    this.form.get("funcionarioId")?.setValue(this.funcionarioLogadoId);
 
-  //         })
-  //     })
-  // }
-  // private obterRequisiçõesDoFuncionarioLogado(): Observable<Requisicao[]> |any{
-  //   this.requisicaoService.selecionarTodos()
-  //     .pipe(
-  //       map(requisicoes =>{
-  //         return requisicoes.filter(req => req.funcionario?.email === this.funcionarioLogado.email);
-  //       })
-  //     )
-  // }
-
+    //configuração inicial para movimentações
+    this.form.get("ultimaAtt")?.setValue(new Date());
+    this.form.get("status")?.setValue("Aberta");
+  }
 }

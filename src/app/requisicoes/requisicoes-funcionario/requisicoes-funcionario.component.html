@@ -3,7 +3,7 @@
     <!-- Conteudo Principal -->
     <div class="col-12 col-md-10 col-lg-9 mx-auto">
       <div class="text-center text-md-start">
-        <h1 class="fw-bolc text-primary">Requisições</h1>
+        <h1 class="fw-bolc text-primary">Minhas Requisições</h1>
       </div>
 
       <div class="d-grid gap-2 d-md-block ">
@@ -28,14 +28,20 @@
           </thead>
           <tbody class="text-center">
             <tr *ngFor="let requisicao of (requisicoes$ | async)">
-              <td>{{requisicao.dataAbertura | date: 'dd/MM/yyyy'}}</td>
+              <td>{{requisicao.dataAbertura.toDate() | date: "dd/MM/yyyy HH:mm:ss" }}</td>
               <td>{{requisicao.departamento?.nome}}</td>
               <td>{{requisicao.descricao}}</td>
-              <td>{{requisicao.equipamento?.nomeEquipamento ? requisicao.equipamento?.nomeEquipamento : "Não informado"
+              <td>{{requisicao.equipamento?.nomeEquipamento ? requisicao.equipamento?.nomeEquipamento : "Não Informado"
                 }}</td>
               <td class="d-grid d-md-block">
+
+                <button [routerLink]="['/requisicoes' , requisicao.id]" type="button"
+                class="btn btn-primary me-0 me-md-1 mb-1 mb-md-auto ">
+                  <i class=" pi pi-tags"></i>
+                </button>
+
                 <button (click)="gravar(modal, requisicao)" type="button"
-                  class="btn btn-primary me-0 me-md-1 mb-1 mb-md-auto">
+                  class="btn btn-outline-primary me-0 me-md-1 mb-1 mb-md-auto">
                   <i class="pi pi-user-edit"></i>
                 </button>
                 <button (click)="excluir(modalExcluir,requisicao)" type="button" class="btn btn-outline-danger">
@@ -68,13 +74,13 @@
         <!-- ngClass esta inputando quando se deve atribuir ao campo quando ele estiver invalido
           para incluir na class do inpute que esta invalido, ou seja, se ele for invalido é como se fosse incluido
           'is-invalid' ali na class ao lado do 'form-control' na linha 72-->
-        <input [ngClass]="(descricao?.touched && descricao?.invalid) ? 'is-invalid' : '' " formControlName="descricao"
-          type="text" class="form-control" placeholder="Digite o nome do funcionário">
-        <!-- A div abaixo serve para mostrar tooltip avisando os erros de validação  -->
+        <textarea [ngClass]="(descricao?.touched && descricao?.invalid) ? 'is-invalid' : '' " formControlName="descricao"
+          class="form-control" type="text" placeholder="Digite a descrição do seu problema"></textarea>
+
         <div class="invalid-tooltip" *ngIf="descricao?.touched && descricao?.invalid">
           <!-- as span estao dividas pois são refeentes a tooltips diferentes -->
-          <span *ngIf="descricao?.errors?.['required']">O nome precisa ser preenchido.</span>
-          <span *ngIf="descricao?.errors?.['minlength']">O nome precisa ter no minimo 3 letras.</span>
+          <span *ngIf="descricao?.errors?.['required']">A descição precisa ser preenchida.</span>
+          <span *ngIf="descricao?.errors?.['minlength']">A descrição precisa ter no minimo 3 letras.</span>
         </div>
       </div>
 
@@ -82,7 +88,8 @@
       <div class="form-group mb-3 position-relative">
         <label for="departamentoId" class="form-label">Departamento</label>
         <ng-select [ngClass]="(departamentoId?.touched && departamentoId?.invalid) ? 'is-invalid' : '' "
-          formControlName="departamentoId" [clearable]="false" [searchable]="false">
+          formControlName="departamentoId" [clearable]="false" [searchable]="false" class="w-75"
+          placeholder="Selecione um departamento">
           <ng-option *ngFor="let departamento of (departamentos$ | async)" [value]="departamento.id">
             {{departamento.nome}}
           </ng-option>
@@ -96,7 +103,7 @@
       <div class="form-group mb-3 position-relative">
         <label for="equipamentoId" class="form-label">Equipamento</label>
         <ng-select [ngClass]="(equipamentoId?.touched && equipamentoId?.invalid) ? 'is-invalid' : '' "
-          formControlName="equipamentoId" [clearable]="false" [searchable]="false">
+          formControlName="equipamentoId" [searchable]="false" class="w-75" placeholder="Selecionae um equipamento">
           <ng-option *ngFor="let equipamento of (equipamentos$ | async)" [value]="equipamento.id">
             {{equipamento.nomeEquipamento}}
           </ng-option>
@@ -106,13 +113,6 @@
           <span *ngIf="equipamentoId?.errors?.['required']">Departamento precisa ser selecionado.</span>
         </div>
       </div>
-
-
-      <!-- esta div e apenas para inseriri o campo senha -->
-
-      <!-- o ngIf esta dizendo que, "se existir um id valido, a div aparece no formulario, caso contrario não" -->
-
-
 
     </div>
 

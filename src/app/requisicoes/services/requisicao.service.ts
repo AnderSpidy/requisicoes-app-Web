@@ -40,7 +40,7 @@ export class RequisicaoService {
               .collection<Departamento>("departamentos")
               .doc(requisicao.departamentoId)
               .valueChanges()
-              .subscribe(x => requisicao.departamento = x);
+              .subscribe(d => requisicao.departamento = d);
 
             this.firestore
               .collection<Funcionario>("funcionarios")
@@ -61,14 +61,33 @@ export class RequisicaoService {
         })
       );
   }
-  
+
   public selecionarRequisicoesFuncionarioAtual(id: string){
     return this.selecionarTodos()
       .pipe(
         map(requisicoes => {
-          return requisicoes.filter(req => req.funcionarioId);
+          return requisicoes.filter(requisicao => requisicao.funcionarioId === id);
         })
       )
+  }
+
+  public selecionarRequisicoesDepartamentoDoFuncionario(id: string){
+    return this.selecionarTodos()
+      .pipe(
+        map(requisicoes => {
+          return requisicoes.filter(requisicao => requisicao.departamentoId === id);
+        })
+      )
+  }
+
+  public selecionarPorId(id: string): Observable<Requisicao> {
+    return this.selecionarTodos()
+      .pipe(
+        take(1),
+        map(requisicoes => {
+          return requisicoes.filter(req => req.id === id)[0];
+        })
+      );
   }
 }
 
