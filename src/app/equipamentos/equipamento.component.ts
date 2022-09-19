@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { Equipamento } from './models/equipamento.model';
 import { EquipamentoService } from './services/equipamento.service';
 import { ValidatorDate } from './date.validador';
+import { dataFuturaValidators } from '../shared/validators/data-futura.validators';
 
 @Component({
   selector: 'app-equipamento',
@@ -29,7 +30,8 @@ export class EquipamentoComponent implements OnInit {
       numeroSerie: new FormControl("", [Validators.required, Validators.minLength(6)]),
       nomeEquipamento: new FormControl("", [Validators.required, Validators.minLength(3)]),
       preco: new FormControl("", [Validators.required]),
-      dataFabricacao: new FormControl("", [ValidatorDate(), Validators.required])
+                                          //Aqui eu estava usando o 'ValidatorDate' que tinha criado, que esta no arquivo 'date.validador.ts', mas troquei para esse que esta na pasta 'shared/validators/data-futura.validators.ts' que foi o que o tiago fez no video de "Validadores Customizados"
+      dataFabricacao: new FormControl("", [dataFuturaValidators(), Validators.required])
     })
   }
   get tituloModal(): string {

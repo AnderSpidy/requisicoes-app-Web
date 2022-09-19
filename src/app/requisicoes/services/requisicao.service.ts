@@ -71,14 +71,14 @@ export class RequisicaoService {
       )
   }
 
-  public selecionarRequisicoesDepartamentoDoFuncionario(id: string){
-    return this.selecionarTodos()
-      .pipe(
-        map(requisicoes => {
-          return requisicoes.filter(requisicao => requisicao.departamentoId === id);
-        })
-      )
-  }
+  // public selecionarRequisicoesDepartamentoDoFuncionario(id: string){
+  //   return this.selecionarTodos()
+  //     .pipe(
+  //       map(requisicoes => {
+  //         return requisicoes.filter(requisicao => requisicao.departamentoId === id);
+  //       })
+  //     )
+  // }
 
   public selecionarPorId(id: string): Observable<Requisicao> {
     return this.selecionarTodos()

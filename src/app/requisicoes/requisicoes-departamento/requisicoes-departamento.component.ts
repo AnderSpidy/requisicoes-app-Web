@@ -49,6 +49,8 @@ export class RequisicoesDepartamentoComponent implements OnInit {
 
     this.departamentos$ = this.departamentoService.selecionarTodos();
     this.equipamentos$ = this.equipamentoService.selecionarTodos();
+    this.requisicoes$ = this.requisicaoService.selecionarTodos();
+
 
 
 
@@ -56,11 +58,7 @@ export class RequisicoesDepartamentoComponent implements OnInit {
       const email: string = usuario?.email!; // ao contrario do ponto de interrogação, o ponto de exclamação significa que 'eu como desenvolvedor estou dizendo que de fato, esse atributo NAO VAI SER NULO!' ou seja -confia pô
 
       this.funcionarioService.selecionarFuncionarioLogado(email)
-        .subscribe(funcionario => {
-          this.funcionarioLogado = funcionario;
-
-          this.requisicoes$ = this.requisicaoService.selecionarRequisicoesDepartamentoDoFuncionario(funcionario.departamentoId);
-        });
+        .subscribe(funcionario =>this.funcionarioLogado = funcionario);
     });
   }
   ngOnDestroy(): void {

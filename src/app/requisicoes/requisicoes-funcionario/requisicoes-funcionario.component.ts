@@ -68,6 +68,8 @@ export class RequisicoesFuncionarioComponent implements OnInit, OnDestroy {
         .subscribe(funcionario => {
           this.funcionarioLogadoId = funcionario.id;
 
+          //VOU DEIXAR DESTA FORMA APENAS PARA VER COMO EXEMPLO, POIS A FORMA COM PIPES CUSTOMIZADOS JA ESTA COM REQUISIÇÕES DEPARTAMENTOS
+
           //dessa forma eu estou usando esse metodo do requisição service, em que ele filtra apenas as requisições que são associados ao funcionario que esta logado
           this.requisicoes$ = this.requisicaoService.selecionarRequisicoesFuncionarioAtual(this.funcionarioLogadoId);
         });
